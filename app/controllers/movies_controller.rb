@@ -7,7 +7,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-	@sort = {}
 	@all_ratings = Movie.get_all_ratings
 	filtered = "1 = 1"
 	@ratingsHash = {}
@@ -28,28 +27,17 @@ class MoviesController < ApplicationController
 	end
     if(params[:release_sort] != nil) then
 		@hilite = {:r=>"hilite",:t=>"none"}
-		@sort[:t] = "asc"
-		if(params[:release_sort] == "asc") then
-			@sort[:r] = "desc"
+		if(params[:release_sort]) then
 			@movies = Movie.find(:all,:order=>"release_date",:conditions => filtered)
-		else
-			@sort[:r] = "asc"
-			@movies = Movie.find(:all,:order=>"release_date DESC",:conditions => filtered)
 		end
     elsif(params[:title_sort] != nil) then
 		@hilite = {:r=>"none",:t=>"hilite"}
-		@sort[:r] = "asc"
-		if(params[:title_sort] == "asc") then
-			@sort[:t] = "desc"
+		if(params[:title_sort]) then
 			@movies = Movie.find(:all,:order=>"title",:conditions => filtered)
-		else
-			@sort[:t] = "asc"
-			@movies = Movie.find(:all,:order=>"title DESC",:conditions => filtered)
+
 		end		
     else
 		@hilite = {:r=>"none",:t=>"none"}
- 		@sort[:t] = "asc"
-		@sort[:r] = "asc"
         @movies = Movie.find(:all,:conditions => filtered)
     end
   end
