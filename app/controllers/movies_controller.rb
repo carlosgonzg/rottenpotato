@@ -7,7 +7,34 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+	@sort = {}
+    puts params[:release_sort] 
+    if(params[:release_sort] != nil) then
+		@hilite = {:r=>"hilite",:t=>"none"}
+		@sort[:t] = "asc"
+		if(params[:release_sort] == "asc") then
+			@sort[:r] = "desc"
+			@movies = Movie.order("release_date").all
+		else
+			@sort[:r] = "asc"
+			@movies = Movie.order("release_date DESC").all
+		end
+    elsif(params[:title_sort] != nil) then
+		@hilite = {:r=>"none",:t=>"hilite"}
+		@sort[:r] = "asc"
+		if(params[:title_sort] == "asc") then
+			@sort[:t] = "desc"
+			@movies = Movie.order("title").all
+		else
+			@sort[:t] = "asc"
+			@movies = Movie.order("title DESC").all
+		end		
+    else
+		@hilite = {:r=>"none",:t=>"none"}
+ 		@sort[:t] = "asc"
+		@sort[:r] = "asc"
+        @movies = Movie.all
+    end
   end
 
   def new
