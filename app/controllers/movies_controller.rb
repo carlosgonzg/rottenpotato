@@ -24,6 +24,7 @@ class MoviesController < ApplicationController
 		session.delete(:sort_r)
 		if(session[:toggle] == nil) then
 			session[:toggle] = true
+			flash.keep
 			redirect_to movies_path(s_hash)
 		else
 			session.delete(:toggle)
