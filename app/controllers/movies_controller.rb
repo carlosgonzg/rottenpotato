@@ -10,18 +10,29 @@ class MoviesController < ApplicationController
 	#Setting Variables
 	#session.clear
 	#session[:ratings] = nil
-	#session[:sort_t] = nil
-	#session[:sort_r] = nil
+	#session[:title_sort] = nil
+	#session[:release_sort] = nil
 	
 	#Session load
 	s_hash = {}
-	if(session[:ratings]!=nil || session[:sort_t]!=nil || session[:sort_r]!=nil) then
+	if(session[:ratings]!=nil || session[:title_sort]!=nil || session[:release_sort]!=nil) then
+		
 		s_hash[:ratings] = (params[:ratings]==nil)? session[:ratings] : params[:ratings]
-		s_hash[:title_sort] = (params[:title_sort] !=nil && session[:release_sort]!=nil) ? params[:title_sort] : session[:sort_t]
-		s_hash[:release_sort] = (params[:release_sort] !=nil && session[:title_sort]!=nil) ? params[:release_sort] : session[:sort_r]
+		if(params[:release_sort].to_s=="true" && session[:title_sort].to_s=="true") then
+			s_hash[:title_sort] = false
+			s_hash[:release_sort] = true
+		elsif(params[:title_sort].to_s=="true" && session[:release_sort].to_s=="true") then
+			s_hash[:title_sort] = true
+			s_hash[:release_sort] = false
+		else
+			s_hash[:title_sort] = session[:title_sort]
+			s_hash[:release_sort] = session[:release_sort]
+		end
+		#s_hash[:title_sort] = (params[:title_sort] !=nil) ? params[:title_sort] : session[:title_sort]
+		#s_hash[:release_sort] = (params[:release_sort] !=nil) ? params[:release_sort] : session[:release_sort]
 		session.delete(:ratings)
-		session.delete(:sort_t)
-		session.delete(:sort_r)
+		session.delete(:title_sort)
+		session.delete(:release_sort)
 		if(session[:toggle] == nil) then
 			session[:toggle] = true
 			flash.keep
@@ -56,7 +67,7 @@ class MoviesController < ApplicationController
 		end
 		session[:ratings] = p_rating
 	end
-	if(params[:commit].to_s == "Refresh" && p_rating == nil) then
+	if(params[:ratings]==nil) then
 		filtered = "1 = 1"
 		@all_ratings.each do |value|
 			@ratingsHash[value] = false
@@ -65,19 +76,19 @@ class MoviesController < ApplicationController
 	#Sorting ASC by release_Date
 	order = ""
 	@hilite = {}
-
-	if(p_release_sort != nil) then
+	@rati = p_release_sort.to_s + " " + p_title_sort.to_s 
+	if(p_release_sort.to_s == "true") then
 		order += "release_date"
 		@hilite[:r] = "hilite"
-		session[:sort_r] = true
-		session[:sort_t] = nil
-	elsif(p_title_sort != nil) then
+		session[:release_sort] = true
+		session[:title_sort] = false
+	elsif(p_title_sort.to_s == "true") then
 		order += "title"
 		@hilite[:t] = "hilite"
-		session[:sort_r] = nil
-		session[:sort_t] = true
+		session[:release_sort] = false
+		session[:title_sort] = true
 	end
-
+	
 	if(order=="") then
 		@movies = Movie.find(:all,:conditions => filtered)
 	else
@@ -94,7 +105,7 @@ class MoviesController < ApplicationController
     @movie = Movie.create!(params[:movie])
     flash[:notice] = "#{@movie.title} was successfully created."
 	flash.keep
-    redirect_to movies_path(:title_sort => session[:sort_t], :release_sort => session[:sort_r], :ratings => session[:ratings])
+    redirect_to movies_path(:title_sort => session[:title_sort], :release_sort => session[:release_sort], :ratings => session[:ratings])
   end
 
   def edit
@@ -113,7 +124,7 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
 	flash.keep
-    redirect_to movies_path(:title_sort => session[:sort_t], :release_sort => session[:sort_r], :ratings => session[:ratings])
+    redirect_to movies_path(:title_sort => session[:title_sort], :release_sort => session[:release_sort], :ratings => session[:ratings])
   end
 
 end
