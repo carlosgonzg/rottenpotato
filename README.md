@@ -1,1 +1,1 @@
-Rotten Potato - Clone WebApp of Rotten Tomatoes
+Rotten Potato - Clone WebApp of Rotten Tomatoes using Ruby On Rails
