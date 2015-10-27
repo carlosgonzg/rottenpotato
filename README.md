@@ -1,2 +1,1 @@
-HW2
-===
+Rotten Potato - Clone WebApp of Rotten Tomatoes
